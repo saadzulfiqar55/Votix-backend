@@ -4,23 +4,14 @@ const connectDB = require('./config/db');
 
 // Load env vars
 dotenv.config();
-
-// Connect to DB
 connectDB();
 
-// Init app
 const app = express();
-
-// Middleware
 app.use(express.json());
 
-// Basic route
-app.get('/', (req, res) => {
-  res.send('✅ Votix Backend API is running!');
-});
+// Routes
+app.get('/', (req, res) => res.send('✅ Votix API is running'));
+app.use('/api/auth', require('./routes/authRoutes'));
 
-// Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
