@@ -1,17 +1,20 @@
 const express = require('express');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-
-// Load env vars
-dotenv.config();
-connectDB();
+const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config();
 
 const app = express();
+
+// Middleware
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 
 // Routes
-app.get('/', (req, res) => res.send('✅ Votix API is running'));
 app.use('/api/auth', require('./routes/authRoutes'));
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+// MongoDB Connect
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB Connected'))
+  .catch(err => console.error(err));
+
+app.listen(5000, () => console.log('🚀 Server running on port 5000'));
