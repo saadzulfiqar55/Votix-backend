@@ -1,25 +1,16 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
 
-const protect = async (req, res, next) => {
-  let token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ message: 'Not authorized, no token' });
+const protect = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Not authorized" });
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id).select('-password');
+    req.user = { id: decoded.id }; // only user id now
     next();
-  } catch (error) {
-    res.status(401).json({ message: 'Token failed' });
+  } catch (err) {
+    res.status(401).json({ message: "Token not valid" });
   }
 };
 
-const adminOnly = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ message: 'Admin access only' });
-  }
-};
-
-module.exports = { protect, adminOnly };
+module.exports = protect;

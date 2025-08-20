@@ -1,33 +1,32 @@
-const express = require('express');
+const express = require("express");
+const Candidate = require("../models/Candidate");
+const protect = require("../middleware/authMiddleware"); // 👈 import your middleware
+
 const router = express.Router();
-const Election = require('../models/Elections');
-const { protect, adminOnly } = require('../middleware/authMiddleware');
 
-// Create Election (Admin only)
-router.post('/', protect, adminOnly, async (req, res) => {
+// ✅ Get candidates by constituency
+router.get("/candidates/:constituency", protect, async (req, res) => {
   try {
-    const { title, description, constituency, candidates } = req.body;
-
-    const election = new Election({
-      title,
-      description,
-      constituency,
-      candidates,
-      createdBy: req.user._id
-    });
-
-    await election.save();
-    res.status(201).json(election);
+    const { constituency } = req.params;
+    const candidates = await Candidate.find({ constituency });
+    res.json(candidates);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// Get All Elections (Admin only for panel, public for voting later)
-router.get('/', protect, adminOnly, async (req, res) => {
+// ✅ Cast vote
+router.post("/vote", protect, async (req, res) => {
   try {
-    const elections = await Election.find();
-    res.json(elections);
+    const { candidateId } = req.body;
+
+    const candidate = await Candidate.findById(candidateId);
+    if (!candidate) return res.status(404).json({ message: "Candidate not found" });
+
+    candidate.votes += 1;
+    await candidate.save();
+
+    res.json({ message: "Vote submitted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

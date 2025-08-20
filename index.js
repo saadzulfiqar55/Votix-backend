@@ -12,6 +12,10 @@ app.use(express.json());
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 
+// After existing imports and app.use for auth
+app.use('/api/elections', require('./routes/electionRoutes'));
+
+
 // MongoDB Connect
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB Connected'))
