@@ -22,3 +22,9 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.error(err));
 
 app.listen(5000, () => console.log('🚀 Server running on port 5000'));
+
+app.use((err, req, res, next) => {
+  console.error(err.stack); // logs full error stack trace in terminal
+  res.status(500).json({ error: "Something broke!" });
+});
+
