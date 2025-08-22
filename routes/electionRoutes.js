@@ -1,35 +1,23 @@
 const express = require("express");
-const Candidate = require("../models/Candidate");
-const protect = require("../middleware/authMiddleware"); // 👈 import your middleware
-
 const router = express.Router();
+const protect = require("../middleware/authMiddleware"); // Auth middleware
+const {
+  addCandidate,
+  getCandidates,
+  voteCandidate,
+  getResults,
+} = require("../controllers/electionController");
+
+// ✅ Add candidate (for now, anyone with token can add)
+router.post("/candidates", protect, addCandidate);
 
 // ✅ Get candidates by constituency
-router.get("/candidates/:constituency", protect, async (req, res) => {
-  try {
-    const { constituency } = req.params;
-    const candidates = await Candidate.find({ constituency });
-    res.json(candidates);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+router.get("/candidates/:constituency", protect, getCandidates);
 
-// ✅ Cast vote
-router.post("/vote", protect, async (req, res) => {
-  try {
-    const { candidateId } = req.body;
+// ✅ Vote for a candidate
+router.post("/vote", protect, voteCandidate);
 
-    const candidate = await Candidate.findById(candidateId);
-    if (!candidate) return res.status(404).json({ message: "Candidate not found" });
-
-    candidate.votes += 1;
-    await candidate.save();
-
-    res.json({ message: "Vote submitted successfully" });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
+// ✅ Global results (party-wise aggregation)
+router.get("/results", protect, getResults);
 
 module.exports = router;
