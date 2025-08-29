@@ -21,7 +21,13 @@ const userSchema = new mongoose.Schema(
     constituency: { 
       type: String,
       required: true 
-    } // e.g. "NA-1"
+    }, // e.g. "NA-1"
+
+    // ✅ Track if user has voted
+    hasVoted: {
+      type: Boolean,
+      default: false,
+    }
   },
   { timestamps: true }
 );
