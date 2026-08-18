@@ -1,3 +1,9 @@
+const dns = require("dns");
+
+// Force Node.js to use Google Public DNS for lookups
+dns.setServers(["8.8.8.8", "8.8.4.4"]);
+
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
